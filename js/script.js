@@ -146,6 +146,7 @@ const projectsData = {
     title: 'Portal QCC - Web Monitoring & Assessment Karyawan',
     organization: 'PT. Toyota Motor Manufacturing Indonesia (Divisi PBOD)',
     category: 'Web Application & SQA Testing',
+    liveUrl: 'https://portalqcc.penyuunsada.my.id/',
     images: [
       { src: 'foto proyek/portalqcc_dashboard.png', caption: 'Dashboard Utama Monitoring Progres QCC' },
       { src: 'foto proyek/portalqcc penilaian karyawan.png', caption: 'Scatter Plot Assessment Penilaian Rata-rata Tim' },
@@ -162,6 +163,7 @@ const projectsData = {
       'Sistem manajemen user terstruktur dengan otentikasi peran (Admin/Evaluator/User).'
     ],
     sqaHighlights: [
+      'Pengujian fungsional dan live deployment verification pada portal resmi: <a href="https://portalqcc.penyuunsada.my.id/" target="_blank" rel="noopener noreferrer">portalqcc.penyuunsada.my.id</a>.',
       'Melakukan pengujian API menyeluruh menggunakan Postman untuk memvalidasi respons status code (200, 400, 500) dan struktur JSON.',
       'Merancang skenario pengujian fungsional (Functional Test Cases) pada kalkulasi skor rata-rata Scatter Plot untuk mencegah bias matematis.',
       'Melakukan regression testing setelah setiap pembaruan modul agar data rapat tersimpan tanpa anomali.',
@@ -172,6 +174,7 @@ const projectsData = {
     title: 'Mesin Pengering Palet Kayu Hybrid Berbasis IoT',
     organization: 'Tugas Akhir / Skripsi - S1 Teknologi Informasi',
     category: 'IoT & Web Monitoring',
+    liveUrl: 'https://penyuunsada.my.id/',
     images: [
       { src: 'foto proyek/proyek pengering palet kayu.png', caption: 'Tampilan Web Dashboard Monitoring Sensor Realtime' },
       { src: 'foto proyek/alat proyek pengering palet kayu.jpeg', caption: 'Hardware Mesin Pengering Palet Kayu Hybrid & Panel Kontrol' }
@@ -187,16 +190,18 @@ const projectsData = {
       'Antarmuka web responsif dan ramah pengguna dengan pembaruan status periodik.'
     ],
     sqaHighlights: [
-      'Pengujian fungsional modul akuisisi data sensor dari mikrokontroler ESP32 ke server web lokal.',
+      'Pengujian fungsional modul telemetri dan live server dashboard pada tautan: <a href="https://penyuunsada.my.id/" target="_blank" rel="noopener noreferrer">penyuunsada.my.id</a>.',
+      'Pengujian fungsional modul akuisisi data sensor dari mikrokontroler ESP32 ke server web lokal dan online.',
       'Verifikasi akurasi pembacaan data sensor terhadap alat ukur standar kalibrasi suhu fisik.',
       'Stress testing konektivitas sensor saat pengeringan berjalan selama siklus waktu panjang.',
       'Validasi logika penutupan pintu dan pemutusan heater saat ambang batas target suhu tercapai.'
     ]
   },
   'pengering-talas': {
-    title: 'Mesin Pengering Daun Talas Beneng Berbasis IoT',
+    title: 'Sistem Monitoring Rumah Pengering Daun Talas Beneng Berbasis IoT',
     organization: 'Penelitian Bersama Dosen - Universitas Darma Persada',
     category: 'Smart Agriculture & IoT Automation',
+    liveUrl: 'https://beneng.jeptira.id/',
     images: [
       { src: 'foto proyek/proyek pengering daun talas beneng.png', caption: 'Dashboard Cerdas Solar Dome Monitoring Daun Talas' },
       { src: 'foto proyek/alat proyek pengering daun talas beneng.png', caption: 'Struktur Alat & Rumah Pengering Solar Dome' }
@@ -212,6 +217,7 @@ const projectsData = {
       'Penyimpanan riwayat pengeringan guna analisis kecepatan evaporasi daun.'
     ],
     sqaHighlights: [
+      'Pengujian sistem pemantauan realtime dan validasi live deployment: <a href="https://beneng.jeptira.id/" target="_blank" rel="noopener noreferrer">beneng.jeptira.id</a>.',
       'Pengujian fungsional logika otomasi relay kipas exhaust saat parameter kelembaban melebihi ambang batas.',
       'Mencatat dan mendokumentasikan bug sinkronisasi waktu antara mikrokontroler dengan server database.',
       'Pengujian ketahanan sinyal Wi-Fi ESP32 dalam kubah Solar Dome.',
@@ -286,6 +292,38 @@ function initProjectModal() {
     modalCategory.textContent = data.category;
     modalOverview.textContent = data.overview;
 
+    // Live URL Setup
+    const modalLiveUrlTop = document.getElementById('modalLiveUrlTop');
+    const modalLiveUrlTopText = document.getElementById('modalLiveUrlTopText');
+    const modalSidebarLiveBlock = document.getElementById('modalSidebarLiveBlock');
+    const modalLiveDemoBtn = document.getElementById('modalLiveDemoBtn');
+
+    if (data.liveUrl) {
+      let hostDisplay = data.liveUrl;
+      try {
+        const parsed = new URL(data.liveUrl);
+        hostDisplay = parsed.hostname;
+      } catch (e) {}
+
+      if (modalLiveUrlTop) {
+        modalLiveUrlTop.href = data.liveUrl;
+        modalLiveUrlTop.style.display = 'inline-flex';
+        if (modalLiveUrlTopText) {
+          modalLiveUrlTopText.textContent = hostDisplay;
+        }
+      }
+      if (modalSidebarLiveBlock) {
+        modalSidebarLiveBlock.style.display = 'flex';
+      }
+      if (modalLiveDemoBtn) {
+        modalLiveDemoBtn.href = data.liveUrl;
+        modalLiveDemoBtn.setAttribute('title', `Buka tautan sistem: ${hostDisplay}`);
+      }
+    } else {
+      if (modalLiveUrlTop) modalLiveUrlTop.style.display = 'none';
+      if (modalSidebarLiveBlock) modalSidebarLiveBlock.style.display = 'none';
+    }
+
     // Gallery Setup
     if (data.images && data.images.length > 0) {
       mainImg.src = data.images[0].src;
@@ -320,7 +358,7 @@ function initProjectModal() {
     modalSqaList.innerHTML = '';
     data.sqaHighlights.forEach(sqa => {
       const li = document.createElement('li');
-      li.textContent = sqa;
+      li.innerHTML = sqa;
       modalSqaList.appendChild(li);
     });
 
