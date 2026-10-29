@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCertFilters();
   initCopyButtons();
   initPhotoLightbox();
+  initLiveDemoModal();
 });
 
 /* ==========================================================================
@@ -222,6 +223,36 @@ const projectsData = {
       'Mencatat dan mendokumentasikan bug sinkronisasi waktu antara mikrokontroler dengan server database.',
       'Pengujian ketahanan sinyal Wi-Fi ESP32 dalam kubah Solar Dome.',
       'Membandingkan hasil aktual kadar kelembaban daun pasca pengeringan dengan spesifikasi standar mutu daun.'
+    ]
+  },
+  'it-ticket': {
+    title: 'IT Ticket System - Sistem Pengelolaan Tiket IT',
+    organization: 'Proyek Independen / Freelance',
+    category: 'Web Application & IT Helpdesk',
+    liveUrl: 'https://it-ticket.penyuunsada.my.id/',
+    images: [
+      { src: 'foto proyek/proyek it ticket it hepldesk analytics.png', caption: 'Dashboard IT Helpdesk Analytics & Overview Tiket' },
+      { src: 'foto proyek/proyek it ticket user management.png', caption: 'Halaman Tickets Management - Pengelolaan Daftar Tiket' },
+      { src: 'foto proyek/proyek it ticket login.png', caption: 'Halaman Login & Registrasi IT Ticket System' }
+    ],
+    role: 'Full-stack Web Developer',
+    period: '2026',
+    tech: ['PHP', 'MySQL', 'JavaScript', 'HTML', 'CSS'],
+    overview: 'Aplikasi berbasis web untuk pencatatan dan pengelolaan tiket kendala IT guna mendukung dokumentasi serta pemantauan proses penanganan masalah. Sistem ini membantu memastikan informasi tiket tercatat secara terstruktur, mempermudah pelacakan status penanganan, dan mendukung keteraturan data permintaan layanan IT.',
+    keyFeatures: [
+      'Dashboard IT Helpdesk Analytics dengan ringkasan statistik tiket (Total Ticket, Open, In Progress, Closed).',
+      'Pencatatan dan pengelolaan tiket kendala IT dengan informasi judul, departemen, prioritas, dan status penanganan.',
+      'Fitur pencarian dan filter tiket berdasarkan status, prioritas, dan departemen untuk memudahkan pemantauan.',
+      'Grafik Top 5 Department dan metrik Average Resolution Time untuk analisis performa penanganan.',
+      'Manajemen pengguna (Users) dengan sistem autentikasi login dan registrasi.',
+      'Halaman Requests untuk pengelolaan permintaan bantuan IT.'
+    ],
+    sqaHighlights: [
+      'Pengujian fungsional dan validasi live deployment pada sistem: <a href="https://it-ticket.penyuunsada.my.id/" target="_blank" rel="noopener noreferrer">it-ticket.penyuunsada.my.id</a>.',
+      'Pengujian alur pencatatan tiket dari pembuatan hingga perubahan status penanganan (Open → In Progress → Closed).',
+      'Validasi fungsionalitas filter dan pencarian tiket berdasarkan status, prioritas, dan departemen.',
+      'Pengujian sistem autentikasi login dan registrasi pengguna dengan validasi input.',
+      'Verifikasi akurasi data statistik dashboard terhadap data tiket aktual di database.'
     ]
   }
 };
@@ -498,3 +529,199 @@ function initPhotoLightbox() {
     document.body.style.overflow = '';
   }
 }
+
+
+/* ==========================================================================
+   7. Live Demo Choice & Auto-Login Modal (Portal QCC & IT Ticket System)
+   ========================================================================== */
+const demoProjectsConfig = {
+  'portal-qcc': {
+    title: 'Live Demo — Portal QCC',
+    homeUrl: 'https://portalqcc.penyuunsada.my.id/',
+    adminDesc: 'Masuk otomatis sebagai Admin PBOD ke Dashboard QCC untuk evaluasi tim & scatter plot.',
+    userDesc: 'Masuk otomatis sebagai Tim QCC (Reweld Team) untuk melihat progres & penilaian grup.',
+    loginAction: 'https://portalqcc.penyuunsada.my.id/Login.php',
+    adminPayload: { username: 'admin', password: 'admin123' },
+    userPayload: { username: 'Reweld Team', password: 'reweld123' },
+    credentials: [
+      { role: 'Admin QCC', user: 'admin', pass: 'admin123' },
+      { role: 'User (Reweld)', user: 'Reweld Team', pass: 'reweld123' }
+    ]
+  },
+  'it-ticket': {
+    title: 'Live Demo — IT Ticket System',
+    homeUrl: 'https://it-ticket.penyuunsada.my.id/',
+    adminDesc: 'Masuk otomatis sebagai Admin IT Support ke Helpdesk Analytics & Manajemen Tiket.',
+    userDesc: 'Masuk otomatis sebagai Karyawan (riri - Dept. HR) untuk simulasi pembuatan & pelacakan tiket.',
+    loginAction: 'https://it-ticket.penyuunsada.my.id/demo-login.php',
+    adminPayload: { role: 'admin' },
+    userPayload: { role: 'user' },
+    credentials: [
+      { role: 'Admin IT', user: 'admin', pass: '123456' },
+      { role: 'User (Staff)', user: 'riri', pass: '123456' }
+    ]
+  }
+};
+
+function initLiveDemoModal() {
+  const modalOverlay = document.getElementById('liveDemoModal');
+  const closeBtn = document.getElementById('liveDemoModalCloseBtn');
+  const modalTitle = document.getElementById('liveDemoModalTitle');
+  const demoAdminDesc = document.getElementById('demoAdminDesc');
+  const demoUserDesc = document.getElementById('demoUserDesc');
+  const demoCredsGrid = document.getElementById('demoCredsGrid');
+  const btnHome = document.getElementById('demoBtnHome');
+  const btnAdmin = document.getElementById('demoBtnAdmin');
+  const btnUser = document.getElementById('demoBtnUser');
+  const autoLoginForm = document.getElementById('autoLoginForm');
+
+  if (!modalOverlay || !closeBtn || !btnHome || !btnAdmin || !btnUser) return;
+
+  let currentProjectKey = null;
+
+  // Open modal triggers from project cards
+  document.querySelectorAll('.btn-open-demo').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const projectKey = btn.getAttribute('data-demo-project');
+      openDemoModal(projectKey);
+    });
+  });
+
+  // Enhance the live demo button in the project detail modal
+  const modalLiveDemoBtn = document.getElementById('modalLiveDemoBtn');
+  if (modalLiveDemoBtn) {
+    modalLiveDemoBtn.addEventListener('click', (e) => {
+      const modalTitleEl = document.getElementById('modalTitle');
+      const text = (modalTitleEl?.textContent || '').toLowerCase();
+      let matchedKey = null;
+      if (text.includes('qcc')) matchedKey = 'portal-qcc';
+      else if (text.includes('ticket')) matchedKey = 'it-ticket';
+
+      if (matchedKey && demoProjectsConfig[matchedKey]) {
+        e.preventDefault();
+        openDemoModal(matchedKey);
+      }
+    });
+  }
+
+  function openDemoModal(projectKey) {
+    const config = demoProjectsConfig[projectKey];
+    if (!config) return;
+
+    currentProjectKey = projectKey;
+    modalTitle.textContent = config.title;
+    if (demoAdminDesc) demoAdminDesc.textContent = config.adminDesc;
+    if (demoUserDesc) demoUserDesc.textContent = config.userDesc;
+
+    // Render transparent credential boxes with quick copy
+    if (demoCredsGrid) {
+      demoCredsGrid.innerHTML = '';
+      config.credentials.forEach(cred => {
+        const col = document.createElement('div');
+        col.className = 'demo-cred-col';
+        col.innerHTML = `
+          <span class="demo-cred-role">${cred.role}</span>
+          <div class="demo-cred-row">
+            <span>User: <strong class="demo-cred-val">${cred.user}</strong></span>
+            <button type="button" class="demo-cred-copy" data-copy-val="${cred.user}" title="Salin Username">Salin</button>
+          </div>
+          <div class="demo-cred-row">
+            <span>Pass: <strong class="demo-cred-val">${cred.pass}</strong></span>
+            <button type="button" class="demo-cred-copy" data-copy-val="${cred.pass}" title="Salin Password">Salin</button>
+          </div>
+        `;
+        demoCredsGrid.appendChild(col);
+      });
+
+      // Attach copy listeners
+      demoCredsGrid.querySelectorAll('.demo-cred-copy').forEach(copyBtn => {
+        copyBtn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          const val = copyBtn.getAttribute('data-copy-val');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(val);
+          }
+          copyBtn.textContent = 'Tersalin!';
+          setTimeout(() => { copyBtn.textContent = 'Salin'; }, 1800);
+        });
+      });
+    }
+
+    modalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDemoModal() {
+    modalOverlay.classList.remove('active');
+    const projModal = document.getElementById('projectModal');
+    if (!projModal || !projModal.classList.contains('active')) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  closeBtn.addEventListener('click', closeDemoModal);
+
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeDemoModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+      closeDemoModal();
+    }
+  });
+
+  // Action 1: Halaman Utama
+  btnHome.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!currentProjectKey) return;
+    const config = demoProjectsConfig[currentProjectKey];
+    if (config && config.homeUrl) {
+      window.open(config.homeUrl, '_blank', 'noopener,noreferrer');
+      closeDemoModal();
+    }
+  });
+
+  // Action 2: Login sebagai Admin
+  btnAdmin.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!currentProjectKey) return;
+    const config = demoProjectsConfig[currentProjectKey];
+    if (config) {
+      performAutoLogin(config.loginAction, config.adminPayload);
+      closeDemoModal();
+    }
+  });
+
+  // Action 3: Login sebagai User
+  btnUser.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!currentProjectKey) return;
+    const config = demoProjectsConfig[currentProjectKey];
+    if (config) {
+      performAutoLogin(config.loginAction, config.userPayload);
+      closeDemoModal();
+    }
+  });
+
+  function performAutoLogin(actionUrl, payload) {
+    if (!autoLoginForm) return;
+    autoLoginForm.action = actionUrl;
+    autoLoginForm.innerHTML = '';
+
+    for (const [key, value] of Object.entries(payload)) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      autoLoginForm.appendChild(input);
+    }
+
+    autoLoginForm.submit();
+  }
+}
+
